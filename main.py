@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from fastapi.staticfiles import StaticFiles
 from app.database import Base, engine
 from app.models import user
 from app.routes.auth import router as auth_router
@@ -24,6 +24,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router)
 app.include_router(vehicle_router)
