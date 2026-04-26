@@ -1,23 +1,20 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
+from app.dependencies import get_db, require_admin
+from app.models.user import User
 from app.models.vehicle import Vehicle
 from app.schemas.vehicle import VehicleCreate, VehicleResponse
-from typing import Optional
 
 router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@router.post("/", response_model=VehicleResponse)
-def create_vehicle(vehicle: VehicleCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)
+def create_vehicle(
+    vehicle: VehicleCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
     new_vehicle = Vehicle(
         brand=vehicle.brand,
         model=vehicle.model,
