@@ -1,5 +1,10 @@
 from fastapi import FastAPI
-from app.database import engine
+
+from app.database import Base, engine
+from app.models import user
+from app.routes.auth import router as auth_router
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="M-Motors API",
@@ -7,16 +12,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.include_router(auth_router)
+
 
 @app.get("/")
 def root():
     return {"message": "API M-Motors opérationnelle"}
-
-
-@app.on_event("startup")
-def test_db():
-    try:
-        with engine.connect():
-            print("Connexion DB OK")
-    except Exception as e:
-        print("Erreur DB :", e)
