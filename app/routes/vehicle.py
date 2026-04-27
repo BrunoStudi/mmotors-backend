@@ -110,7 +110,24 @@ def update_vehicle(
 
     return vehicle
 
+@router.delete("/{vehicle_id}", status_code=204)
+def delete_vehicle(
+    vehicle_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
+    if not vehicle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Véhicule introuvable"
+        )
+
+    db.delete(vehicle)
+    db.commit()
+
+    return
 
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
