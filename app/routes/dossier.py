@@ -26,6 +26,11 @@ def format_dossier(dossier: Dossier):
             if dossier.vehicle
             else None
         ),
+        "vehicle_image": (
+            dossier.vehicle.images[0].image_url
+            if dossier.vehicle and dossier.vehicle.images
+            else None
+        ),
     }
 
 

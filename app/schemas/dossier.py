@@ -15,6 +15,7 @@ class DossierResponse(BaseModel):
     admin_comment: str | None
     user_email: str
     vehicle_name: str
+    vehicle_image: str | None = None
     created_at: datetime
 
     class Config:
