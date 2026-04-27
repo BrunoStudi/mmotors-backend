@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db, require_admin
 from app.models.user import User
 from app.models.vehicle import Vehicle
-from app.schemas.vehicle import VehicleCreate, VehicleResponse
+from app.schemas.vehicle import VehicleCreate, VehicleUpdate, VehicleResponse
 from app.models.vehicle_image import VehicleImage
 import os
 import shutil
@@ -80,6 +80,37 @@ def upload_vehicle_image(
         "message": "Image ajoutée avec succès",
         "image": image_url
     }
+
+
+@router.put("/{vehicle_id}", response_model=VehicleResponse)
+def update_vehicle(
+    vehicle_id: int,
+    vehicle_data: VehicleUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+
+    if not vehicle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Véhicule introuvable"
+        )
+
+    update_data = vehicle_data.model_dump(exclude_unset=True)
+
+    if "type" in update_data and update_data["type"]:
+        update_data["type"] = update_data["type"].lower()
+
+    for field, value in update_data.items():
+        setattr(vehicle, field, value)
+
+    db.commit()
+    db.refresh(vehicle)
+
+    return vehicle
+
+
 
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):

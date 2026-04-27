@@ -36,3 +36,15 @@ class VehicleResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class VehicleUpdate(BaseModel):
+    brand: str | None = None
+    model: str | None = None
+    price: float | None = None
+    type: str | None = None
+    mileage: int | None = None
+    year: int | None = None
+    engine: str | None = None
+    power: int | None = None
+    description: str | None = None
