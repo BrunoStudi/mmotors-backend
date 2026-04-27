@@ -5,6 +5,7 @@ from app.models import user
 from app.routes.auth import router as auth_router
 from app.routes.vehicle import router as vehicle_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes import dossier
 
 Base.metadata.create_all(bind=engine)
 
@@ -29,6 +30,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router)
 app.include_router(vehicle_router)
+app.include_router(dossier.router)
 
 
 @app.get("/")
