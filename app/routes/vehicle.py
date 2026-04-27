@@ -17,7 +17,7 @@ router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 def create_vehicle(
     vehicle: VehicleCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin)
+    current_user: User = Depends(require_admin),
 ):
     new_vehicle = Vehicle(
         brand=vehicle.brand,
@@ -28,7 +28,7 @@ def create_vehicle(
         year=vehicle.year,
         engine=vehicle.engine,
         power=vehicle.power,
-        description=vehicle.description
+        description=vehicle.description,
     )
 
     db.add(new_vehicle)
@@ -37,25 +37,25 @@ def create_vehicle(
 
     return new_vehicle
 
+
 @router.post("/{vehicle_id}/images")
 def upload_vehicle_image(
     vehicle_id: int,
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin)
+    current_user: User = Depends(require_admin),
 ):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
     if not vehicle:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Véhicule introuvable"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Véhicule introuvable"
         )
 
     if not image.content_type.startswith("image/"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Seuls les fichiers image sont autorisés"
+            detail="Seuls les fichiers image sont autorisés",
         )
 
     upload_dir = f"uploads/vehicles/{vehicle_id}"
@@ -68,18 +68,12 @@ def upload_vehicle_image(
 
     image_url = f"/uploads/vehicles/{vehicle_id}/{image.filename}"
 
-    vehicle_image = VehicleImage(
-        vehicle_id=vehicle_id,
-        image_url=image_url
-    )
+    vehicle_image = VehicleImage(vehicle_id=vehicle_id, image_url=image_url)
 
     db.add(vehicle_image)
     db.commit()
 
-    return {
-        "message": "Image ajoutée avec succès",
-        "image": image_url
-    }
+    return {"message": "Image ajoutée avec succès", "image": image_url}
 
 
 @router.put("/{vehicle_id}", response_model=VehicleResponse)
@@ -87,14 +81,13 @@ def update_vehicle(
     vehicle_id: int,
     vehicle_data: VehicleUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin)
+    current_user: User = Depends(require_admin),
 ):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
     if not vehicle:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Véhicule introuvable"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Véhicule introuvable"
         )
 
     update_data = vehicle_data.model_dump(exclude_unset=True)
@@ -110,18 +103,18 @@ def update_vehicle(
 
     return vehicle
 
+
 @router.delete("/{vehicle_id}", status_code=204)
 def delete_vehicle(
     vehicle_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin)
+    current_user: User = Depends(require_admin),
 ):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
     if not vehicle:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Véhicule introuvable"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Véhicule introuvable"
         )
 
     db.delete(vehicle)
@@ -129,9 +122,35 @@ def delete_vehicle(
 
     return
 
+
+@router.delete("/images/{image_id}", status_code=204)
+def delete_vehicle_image(
+    image_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    image = db.query(VehicleImage).filter(VehicleImage.id == image_id).first()
+
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Image introuvable"
+        )
+
+    file_path = image.image_url.lstrip("/")
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    db.delete(image)
+    db.commit()
+
+    return
+
+
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
     return db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+
 
 @router.get("/", response_model=list[VehicleResponse])
 def get_vehicles(type: Optional[str] = None, db: Session = Depends(get_db)):
