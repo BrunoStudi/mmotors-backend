@@ -11,5 +11,10 @@ class Vehicle(Base):
     model = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     type = Column(String, nullable=False)  # "vente" ou "location"
+    mileage = Column(Integer, nullable=True)
+    year = Column(Integer, nullable=True)
+    engine = Column(String, nullable=True)
+    power = Column(Integer, nullable=True)
+    description = Column(String, nullable=True)
 
     images = relationship("VehicleImage", back_populates="vehicle")

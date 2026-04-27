@@ -23,7 +23,12 @@ def create_vehicle(
         brand=vehicle.brand,
         model=vehicle.model,
         price=vehicle.price,
-        type=vehicle.type.lower()
+        type=vehicle.type.lower(),
+        mileage=vehicle.mileage,
+        year=vehicle.year,
+        engine=vehicle.engine,
+        power=vehicle.power,
+        description=vehicle.description
     )
 
     db.add(new_vehicle)

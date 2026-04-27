@@ -14,6 +14,11 @@ class VehicleCreate(BaseModel):
     model: str
     price: float
     type: str
+    mileage: int | None = None
+    year: int | None = None
+    engine: str | None = None
+    power: int | None = None
+    description: str | None = None
 
 
 class VehicleResponse(BaseModel):
@@ -22,6 +27,11 @@ class VehicleResponse(BaseModel):
     model: str
     price: float
     type: str
+    mileage: int | None = None
+    year: int | None = None
+    engine: str | None = None
+    power: int | None = None
+    description: str | None = None
     images: list[VehicleImageResponse] = []
 
     class Config:
