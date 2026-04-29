@@ -23,6 +23,9 @@ def upload_document(
 
     if not dossier:
         raise HTTPException(status_code=404, detail="Dossier introuvable")
+    
+    if dossier.status == "refusé":
+        raise HTTPException(status_code=400, detail="Dossier refusé")
 
     if dossier.user_id != current_user.id and current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Accès interdit")
