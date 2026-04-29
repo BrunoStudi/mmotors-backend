@@ -23,7 +23,7 @@ def upload_document(
 
     if not dossier:
         raise HTTPException(status_code=404, detail="Dossier introuvable")
-    
+
     if dossier.status == "refusé":
         raise HTTPException(status_code=400, detail="Dossier refusé")
 
@@ -47,3 +47,29 @@ def upload_document(
     db.commit()
 
     return {"message": "Document ajouté", "file_url": doc.file_url}
+
+
+@router.get("/{dossier_id}")
+def get_documents(
+    dossier_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    dossier = db.query(Dossier).filter(Dossier.id == dossier_id).first()
+
+    if not dossier:
+        raise HTTPException(status_code=404, detail="Dossier introuvable")
+
+    if dossier.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès interdit")
+
+    documents = db.query(Document).filter(Document.dossier_id == dossier_id).all()
+
+    return [
+        {
+            "id": doc.id,
+            "file_url": doc.file_url,
+            "filename": doc.file_url.split("/")[-1],
+        }
+        for doc in documents
+    ]
