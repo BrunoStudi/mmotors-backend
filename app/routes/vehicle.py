@@ -149,8 +149,15 @@ def delete_vehicle_image(
 
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
-    return db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+    vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
+    if not vehicle:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Véhicule introuvable"
+        )
+
+    return vehicle
 
 @router.get("/", response_model=list[VehicleResponse])
 def get_vehicles(type: Optional[str] = None, db: Session = Depends(get_db)):
