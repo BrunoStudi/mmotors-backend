@@ -6,9 +6,11 @@ from app.models.user import User
 from app.models.vehicle import Vehicle
 from app.schemas.vehicle import VehicleCreate, VehicleUpdate, VehicleResponse
 from app.models.vehicle_image import VehicleImage
+from app.models.dossier import Dossier
+from app.models.document import Document
+from app.models.vehicle_image import VehicleImage
 import os
 import shutil
-
 
 router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 
@@ -104,18 +106,42 @@ def update_vehicle(
     return vehicle
 
 
-@router.delete("/{vehicle_id}", status_code=204)
+@router.delete("/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_vehicle(
     vehicle_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin),
+    current_user: User = Depends(require_admin)
 ):
     vehicle = db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
 
     if not vehicle:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Véhicule introuvable"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Véhicule introuvable"
         )
+
+    dossiers = db.query(Dossier).filter(Dossier.vehicle_id == vehicle_id).all()
+
+    for dossier in dossiers:
+        documents = db.query(Document).filter(Document.dossier_id == dossier.id).all()
+
+        for document in documents:
+            file_path = document.file_url.lstrip("/")
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            db.delete(document)
+
+        db.delete(dossier)
+
+    images = db.query(VehicleImage).filter(VehicleImage.vehicle_id == vehicle_id).all()
+
+    for image in images:
+        file_path = image.image_url.lstrip("/")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        db.delete(image)
 
     db.delete(vehicle)
     db.commit()
