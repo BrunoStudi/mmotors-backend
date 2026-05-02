@@ -7,6 +7,7 @@ from app.routes.vehicle import router as vehicle_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import dossier
 from app.routes import document
+import os
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,6 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router)
