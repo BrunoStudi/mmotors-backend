@@ -23,6 +23,7 @@ app.add_middleware(
         "http://localhost:5173",
         "https://mmotors-frontend-8st1.vercel.app",
         "https://mmotors-frontend-8st1-git-main-brunos-projects-853488ad.vercel.app",
+        "https://mmotors-frontend-8st1-9c1bq79a2-brunos-projects-853488ad.vercel.app/",
     ],
     allow_credentials=True,
     allow_methods=["*"],
