@@ -14,14 +14,14 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="M-Motors API",
     description="API backend pour la plateforme M-Motors",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://127.0.0.1:5173",
+        "https://mmotors-frontend-8st1.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
