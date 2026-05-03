@@ -378,45 +378,85 @@ exit()
 ## 17. Structure du projet
 
 mmotors-backend/
+
 │
+
 ├── app/
+
 │   ├── core/
+
 │   │   └── security.py
+
 │   │
+
 │   ├── models/
+
 │   │   ├── user.py
+
 │   │   ├── vehicle.py
+
 │   │   ├── vehicle_image.py
+
 │   │   ├── dossier.py
+
 │   │   └── document.py
+
 │   │
+
 │   ├── routes/
+
 │   │   ├── auth.py
+
 │   │   ├── vehicle.py
+
 │   │   ├── dossier.py
+
 │   │   └── document.py
+
 │   │
+
 │   ├── schemas/
+
 │   │   ├── user.py
+
 │   │   ├── vehicle.py
+
 │   │   └── dossier.py
+
 │   │
+
 │   ├── database.py
+
 │   └── dependencies.py
+
 │
+
 ├── tests/
+
 │   ├── test_auth.py
+
 │   ├── test_vehicles.py
+
 │   ├── test_dossiers.py
+
 │   ├── test_documents.py
+
 │   ├── test_security.py
+
 │   └── test_full_flow.py
+
 │
+
 ├── uploads/
+
 ├── main.py
+
 ├── requirements.txt
+
 ├── Procfile
+
 ├── .env
+
 └── README.md
 
 ---
