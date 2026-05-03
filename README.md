@@ -75,13 +75,7 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60  
 ```
 
-Adapter selon votre configuration PostgreSQL.
-
-Exemple :
-
-```bash
-DATABASE_URL=postgresql://postgres:admin@localhost:5432/mmotors  
-```
+Adapter selon votre configuration PostgreSQL avec le bon mot de passe.
 
 ---
 
@@ -94,7 +88,7 @@ CREATE DATABASE mmotors;
 CREATE DATABASE mmotors_test;  
 ```
 
-(Vous pouvez aussi utiliser pgAdmin4 → Query Tool → bouton "play")
+(Vous pouvez aussi utiliser pgAdmin4 → Query Tool → la commande → bouton "play")
 
 ---
 
@@ -196,16 +190,26 @@ GET /documents/{dossier_id}
 
 ## 11. Lancement des tests
 
+Créez une variable d'environnement **.env.test**
+avec comme contenu :
+
+```bash
+DATABASE_URL=postgresql://postgres:motdepasse@localhost:5432/mmotors_test
+SECRET_KEY=change_me_secret_key  
+ALGORITHM=HS256  
+ACCESS_TOKEN_EXPIRE_MINUTES=60 
+```
+
 Depuis votre terminal:
 
 ```bash
-pytest  
+$env:ENV="test"; python -m pytest  
 ```
 
 Couverture :
 
 ```bash
-pytest --cov=app  
+$env:ENV="test"; python -m pytest --cov=app 
 ```
 
 ---
@@ -214,7 +218,7 @@ pytest --cov=app
 
 BDD dédiée :
 
-mmotors_test  
+**mmotors_test** 
 
 Les tests doivent créer leurs propres données :
 
@@ -241,7 +245,7 @@ Ne pas utiliser d’IDs en dur.
 
 Dossier utilisé :
 
-uploads/  
+**uploads/**  
 
 Sur Heroku :
 
@@ -259,7 +263,7 @@ Solutions recommandées :
 
 Fichier requis :
 
-Procfile  
+**Procfile**  
 
 Contenu :
 
@@ -336,4 +340,6 @@ mmotors-backend/
 
 ## 19. Auteur
 
-Bruno
+Projet réalisé dans le cadre de la formation CDA / Bachelor Développeur d’Application.
+
+Auteur : Bruno
