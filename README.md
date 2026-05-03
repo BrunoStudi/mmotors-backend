@@ -318,7 +318,9 @@ mmotors-backend/
 │  
 ├── tests/  
 ├── uploads/  
-├── main.py  
+├── main.py 
+├── .env
+├── .env.test
 ├── requirements.txt  
 ├── Procfile  
 └── README.md  
