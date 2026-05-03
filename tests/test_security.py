@@ -7,3 +7,11 @@ def test_password_hash():
 
     assert hashed != password
     assert verify_password(password, hashed) is True
+
+def test_password_verify_fail():
+    password = "Test1234"
+    wrong_password = "Wrong1234"
+
+    hashed = hash_password(password)
+
+    assert verify_password(wrong_password, hashed) is False

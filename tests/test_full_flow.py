@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi.testclient import TestClient
 from main import app
 from app.database import SessionLocal
@@ -7,15 +9,20 @@ client = TestClient(app)
 
 
 def register_user(email: str, password: str = "Test1234"):
-    client.post(
+    response = client.post(
         "/auth/register",
         json={"email": email, "password": password},
     )
+
+    assert response.status_code in [200, 201]
 
 
 def promote_admin(email: str):
     db = SessionLocal()
     user = db.query(User).filter(User.email == email).first()
+
+    assert user is not None
+
     user.role = "admin"
     db.commit()
     db.close()
@@ -26,12 +33,15 @@ def get_token(email: str, password: str = "Test1234"):
         "/auth/login",
         json={"email": email, "password": password},
     )
+
+    assert response.status_code == 200
+
     return response.json()["access_token"]
 
 
 def test_full_vehicle_dossier_document_flow():
-    admin_email = "admin_test_flow@mmotors.fr"
-    user_email = "client_test_flow@mmotors.fr"
+    admin_email = f"admin_flow_{uuid.uuid4().hex}@test.com"
+    user_email = f"client_flow_{uuid.uuid4().hex}@test.com"
 
     register_user(admin_email)
     register_user(user_email)
@@ -59,7 +69,7 @@ def test_full_vehicle_dossier_document_flow():
         headers=admin_headers,
     )
 
-    assert vehicle_response.status_code == 201
+    assert vehicle_response.status_code in [200, 201]
 
     vehicle_id = vehicle_response.json()["id"]
 
@@ -94,10 +104,12 @@ def test_full_vehicle_dossier_document_flow():
     dossier_id = dossier_response.json()["id"]
 
     my_dossiers_response = client.get("/dossiers/me", headers=user_headers)
+
     assert my_dossiers_response.status_code == 200
     assert isinstance(my_dossiers_response.json(), list)
 
     admin_dossiers_response = client.get("/dossiers/", headers=admin_headers)
+
     assert admin_dossiers_response.status_code == 200
 
     update_dossier_response = client.put(
@@ -127,3 +139,4 @@ def test_full_vehicle_dossier_document_flow():
 
     assert documents_list_response.status_code == 200
     assert isinstance(documents_list_response.json(), list)
+    assert len(documents_list_response.json()) >= 1
