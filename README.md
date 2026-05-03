@@ -30,6 +30,7 @@ Avant de lancer le projet en local, installer :
 depuis le terminal de votre IDE tapez les commandes suivantes:
 
 git clone https://github.com/BrunoStudi/mmotors-backend.git
+
 cd mmotors-backend
 
 ---
@@ -41,11 +42,13 @@ Sur Windows:
 Entrez ces commandes dans le terminal:
 
 python -m venv venv
+
 venv\Scripts\activate
 
 Sur Linux / Mac:
 
 python3 -m venv venv
+
 source venv/bin/activate
 
 ---
@@ -63,8 +66,11 @@ pip install -r requirements.txt
 Créer un fichier .env à la racine du projet et y mettre le contenu suivant:
 
 DATABASE_URL=postgresql://postgres:motdepasse@localhost:5432/mmotors
+
 SECRET_KEY=change_me_secret_key
+
 ALGORITHM=HS256
+
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 
 Adapter les valeurs selon votre configuration PostgreSQL locale.
@@ -85,6 +91,7 @@ une base dédiée aux tests.
 Exemple dans PostgreSQL:
 
 CREATE DATABASE mmotors;
+
 CREATE DATABASE mmotors_test;
 
 (Vous pouvez aussi utiliser pgAdmin4 et utiliser Querrytools 
@@ -100,6 +107,7 @@ La base mmotors_test est utilisée uniquement pour les tests automatisés.
 Le projet utilise SQLAlchemy pour la définition des modèles.
 
 Pour créer les tables en local, lancer Python depuis la racine du projet :
+
 Dans le terminal entrez cette commande:
 
 python
@@ -107,7 +115,9 @@ python
 Puis un fois dans l'interface python exécuter ce code :
 
 from app.database import Base, engine
+
 Base.metadata.create_all(bind=engine)
+
 exit()
 
 Les tables suivantes sont créées :
@@ -130,19 +140,27 @@ python
 Puis une fois dans l'interface python executez ce code :
 
 from app.database import SessionLocal
+
 from app.models.user import User
+
 from app.core.security import hash_password
 
 db = SessionLocal()
 
 admin = User(
+
     email="admin@mmotors.fr",
+
     password=hash_password("Admin1234"),
+
     role="admin"
+
 )
 
 db.add(admin)
+
 db.commit()
+
 db.close()
 
 exit()
@@ -150,6 +168,7 @@ exit()
 Compte administrateur local :
 
 Email : admin@mmotors.fr
+
 Mot de passe : Admin1234
 
 Un compte client peut être créé directement depuis l’interface front-end ou via Swagger.
@@ -177,28 +196,41 @@ http://127.0.0.1:8000/docs
 Authentification:
 
 POST /auth/register
+
 POST /auth/login
 
 Véhicules:
 
 GET    /vehicles/
+
 GET    /vehicles/{vehicle_id}
+
 POST   /vehicles/
+
 PUT    /vehicles/{vehicle_id}
+
 DELETE /vehicles/{vehicle_id}
+
 POST   /vehicles/{vehicle_id}/images
+
 DELETE /vehicles/images/{image_id}
+
 
 Dossiers:
 
 POST /dossiers/
+
 GET  /dossiers/me
+
 GET  /dossiers/
+
 PUT  /dossiers/{dossier_id}
+
 
 Documents:
 
 POST /documents/{dossier_id}/documents
+
 GET  /documents/{dossier_id}
 
 ---
@@ -219,10 +251,15 @@ La couverture obtenue sur le projet est supérieure à 80 %, conformément à l�
 Les tests couvrent notamment :
 
 l’authentification ;
+
 la sécurité des mots de passe ;
+
 la gestion des véhicules ;
+
 la création et le suivi des dossiers ;
+
 l’upload et la consultation des documents ;
+
 les contrôles d’accès selon les rôles.
 
 ---
@@ -236,9 +273,13 @@ Une base dédiée mmotors_test est prévue pour les tests automatisés.
 Les tests doivent créer leurs propres données avant exécution :
 
 utilisateur client ;
+
 utilisateur administrateur ;
+
 véhicule ;
+
 dossier ;
+
 document.
 
 Cette approche évite les tests fragiles basés sur des IDs codés en dur.
@@ -250,11 +291,17 @@ Cette approche évite les tests fragiles basés sur des IDs codés en dur.
 Plusieurs mesures de sécurité sont mises en place :
 
 hachage des mots de passe avec bcrypt ;
+
 authentification par JWT ;
+
 routes protégées par dépendances FastAPI ;
+
 contrôle d’accès par rôle ;
+
 séparation des droits client / administrateur ;
+
 contrôle d’accès aux dossiers et documents ;
+
 configuration CORS limitée aux origines autorisées.
 
 En production, seules les URLs nécessaires sont autorisées dans la configuration CORS.
@@ -277,8 +324,11 @@ il faut alors reuploader les images ou documents en editant la donnée ou en cre
 Pour une version de production complète, un stockage externe serait recommandé :
 
 Amazon S3 ;
+
 Cloudinary ;
+
 Supabase Storage ;
+
 autre service équivalent.
 
 ---
@@ -290,6 +340,7 @@ Le backend est prévu pour être déployé sur Heroku.
 Fichiers nécessaires :
 
 Procfile
+
 requirements.txt
 
 Contenu du Procfile :
@@ -317,7 +368,9 @@ heroku run python -a nom-application-heroku
 Puis une fois dans l'interface python :
 
 from app.database import Base, engine
+
 Base.metadata.create_all(bind=engine)
+
 exit()
 
 ---
@@ -373,13 +426,21 @@ mmotors-backend/
 Le backend permet :
 
 l’inscription et la connexion des utilisateurs ;
+
 la sécurisation des routes par JWT ;
+
 la gestion des rôles client et administrateur ;
+
 la création, modification et suppression des véhicules ;
+
 l’ajout et la suppression d’images de véhicules ;
+
 le dépôt de dossiers client ;
+
 le suivi du statut des dossiers ;
+
 la validation ou le refus des dossiers par l’administrateur ;
+
 l’upload et la consultation de documents liés aux dossiers.
 
 ---
