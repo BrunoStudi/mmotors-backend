@@ -27,57 +27,61 @@ Avant de lancer le projet en local, installer :
 
 ## 2. Cloner le dépôt
 
-depuis le terminal de votre IDE tapez les commandes suivantes:
+Depuis le terminal de votre IDE tapez les commandes suivantes :
 
-git clone https://github.com/BrunoStudi/mmotors-backend.git
-
+```bash
+git clone https://github.com/BrunoStudi/mmotors-backend.git  
 cd mmotors-backend
+```
 
 ---
 
 ## 3. Créer et activer l’environnement virtuel
 
-Sur Windows:
+Sur Windows :
 
-Entrez ces commandes dans le terminal:
+```bash
+python -m venv venv  
+venv\Scripts\activate  
+```
 
-python -m venv venv
+Sur Linux / Mac :
 
-venv\Scripts\activate
-
-Sur Linux / Mac:
-
-python3 -m venv venv
-
-source venv/bin/activate
+```bash
+python3 -m venv venv  
+source venv/bin/activate  
+```
 
 ---
 
 ## 4. Installer les dépendances
 
-Entrez cette commande dans le terminal:
+Depuis votre terminal :
 
-pip install -r requirements.txt
+```bash
+pip install -r requirements.txt  
+```
 
 ---
 
 ## 5. Configuration des variables d’environnement
 
-Créer un fichier .env à la racine du projet et y mettre le contenu suivant:
+Créer un fichier `.env` à la racine du projet et y mettre :
 
-DATABASE_URL=postgresql://postgres:motdepasse@localhost:5432/mmotors
+```bash
+DATABASE_URL=postgresql://postgres:motdepasse@localhost:5432/mmotors  
+SECRET_KEY=change_me_secret_key  
+ALGORITHM=HS256  
+ACCESS_TOKEN_EXPIRE_MINUTES=60  
+```
 
-SECRET_KEY=change_me_secret_key
-
-ALGORITHM=HS256
-
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-
-Adapter les valeurs selon votre configuration PostgreSQL locale.
+Adapter selon votre configuration PostgreSQL.
 
 Exemple :
 
-DATABASE_URL=postgresql://postgres:admin@localhost:5432/mmotors
+```bash
+DATABASE_URL=postgresql://postgres:admin@localhost:5432/mmotors  
+```
 
 ---
 
@@ -85,408 +89,251 @@ DATABASE_URL=postgresql://postgres:admin@localhost:5432/mmotors
 
 Créer deux bases PostgreSQL :
 
-une base pour le développement local ;
-une base dédiée aux tests.
+```bash
+CREATE DATABASE mmotors;  
+CREATE DATABASE mmotors_test;  
+```
 
-Exemple dans PostgreSQL:
-
-CREATE DATABASE mmotors;
-
-CREATE DATABASE mmotors_test;
-
-(Vous pouvez aussi utiliser pgAdmin4 et utiliser Querrytools 
-pour entrez les commandes et appuyer sur le "play vert" pour valider les commandes)
-
-La base mmotors est utilisée pour l’application locale.
-La base mmotors_test est utilisée uniquement pour les tests automatisés.
+(Vous pouvez aussi utiliser pgAdmin4 → Query Tool → bouton "play")
 
 ---
 
 ## 7. Création des tables
 
-Le projet utilise SQLAlchemy pour la définition des modèles.
+Dans le terminal :
 
-Pour créer les tables en local, lancer Python depuis la racine du projet :
+```bash
+python  
+```
 
-Dans le terminal entrez cette commande:
+Puis dans Python :
 
-python
-
-Puis un fois dans l'interface python exécuter ce code :
-
-from app.database import Base, engine
-
-Base.metadata.create_all(bind=engine)
-
-exit()
-
-Les tables suivantes sont créées :
-
-- users
-- vehicles
-- vehicle_images
-- dossiers
-- documents
+```bash
+from app.database import Base, engine  
+Base.metadata.create_all(bind=engine)  
+exit()  
+```
 
 ---
 
 ## 8. Jeu de données local
 
-Pour tester l’application, il est possible de créer un compte administrateur depuis un shell Python.
-Entrez cette commande dans le terminal:
+Dans le terminal :
 
-python
+```bash
+python  
+```
 
-Puis une fois dans l'interface python executez ce code :
+Puis :
 
-from app.database import SessionLocal
+```bash
+from app.database import SessionLocal  
+from app.models.user import User  
+from app.core.security import hash_password  
 
-from app.models.user import User
+db = SessionLocal()  
 
-from app.core.security import hash_password
+admin = User(  
+    email="admin@mmotors.fr",  
+    password=hash_password("Admin1234"),  
+    role="admin"  
+)  
 
-db = SessionLocal()
+db.add(admin)  
+db.commit()  
+db.close()  
 
-admin = User(
+exit()  
+```
 
-    email="admin@mmotors.fr",
+Compte admin :
 
-    password=hash_password("Admin1234"),
-
-    role="admin"
-
-)
-
-db.add(admin)
-
-db.commit()
-
-db.close()
-
-exit()
-
-Compte administrateur local :
-
-Email : admin@mmotors.fr
-
-Mot de passe : Admin1234
-
-Un compte client peut être créé directement depuis l’interface front-end ou via Swagger.
+Email : admin@mmotors.fr  
+Mot de passe : Admin1234  
 
 ---
 
 ## 9. Lancer le backend en local
 
-depuis votre terminal de l'ide ou autre entrez cette commande :
+```bash
+uvicorn main:app --reload  
+```
 
-uvicorn main:app --reload
+API :  
+http://127.0.0.1:8000  
 
-L’API est disponible sur :
-
-http://127.0.0.1:8000
-
-La documentation Swagger est disponible sur :
-
-http://127.0.0.1:8000/docs
+Swagger :  
+http://127.0.0.1:8000/docs  
 
 ---
 
 ## 10. Endpoints principaux
 
-Authentification:
+Authentification :  
+POST /auth/register  
+POST /auth/login  
 
-POST /auth/register
+Véhicules :  
+GET /vehicles/  
+GET /vehicles/{vehicle_id}  
+POST /vehicles/  
+PUT /vehicles/{vehicle_id}  
+DELETE /vehicles/{vehicle_id}  
+POST /vehicles/{vehicle_id}/images  
+DELETE /vehicles/images/{image_id}  
 
-POST /auth/login
+Dossiers :  
+POST /dossiers/  
+GET /dossiers/me  
+GET /dossiers/  
+PUT /dossiers/{dossier_id}  
 
-Véhicules:
-
-GET    /vehicles/
-
-GET    /vehicles/{vehicle_id}
-
-POST   /vehicles/
-
-PUT    /vehicles/{vehicle_id}
-
-DELETE /vehicles/{vehicle_id}
-
-POST   /vehicles/{vehicle_id}/images
-
-DELETE /vehicles/images/{image_id}
-
-
-Dossiers:
-
-POST /dossiers/
-
-GET  /dossiers/me
-
-GET  /dossiers/
-
-PUT  /dossiers/{dossier_id}
-
-
-Documents:
-
-POST /documents/{dossier_id}/documents
-
-GET  /documents/{dossier_id}
+Documents :  
+POST /documents/{dossier_id}/documents  
+GET /documents/{dossier_id}  
 
 ---
 
 ## 11. Lancement des tests
 
-Les tests automatisés sont réalisés avec Pytest.
-Depuis votre terminal entrez cette commande :
+Depuis votre terminal:
 
-pytest
+```bash
+pytest  
+```
 
-Pour afficher la couverture de test entrez cette commande :
+Couverture :
 
-pytest --cov=app
-
-La couverture obtenue sur le projet est supérieure à 80 %, conformément à l’objectif demandé.
-
-Les tests couvrent notamment :
-
-l’authentification ;
-
-la sécurité des mots de passe ;
-
-la gestion des véhicules ;
-
-la création et le suivi des dossiers ;
-
-l’upload et la consultation des documents ;
-
-les contrôles d’accès selon les rôles.
+```bash
+pytest --cov=app  
+```
 
 ---
 
 ## 12. Base de données de test
 
-Les tests ne doivent pas dépendre d’identifiants fixes existants en base.
+BDD dédiée :
 
-Une base dédiée mmotors_test est prévue pour les tests automatisés.
+mmotors_test  
 
-Les tests doivent créer leurs propres données avant exécution :
+Les tests doivent créer leurs propres données :
 
-utilisateur client ;
+- utilisateur  
+- véhicule  
+- dossier  
+- document  
 
-utilisateur administrateur ;
-
-véhicule ;
-
-dossier ;
-
-document.
-
-Cette approche évite les tests fragiles basés sur des IDs codés en dur.
+Ne pas utiliser d’IDs en dur.
 
 ---
 
 ## 13. Sécurité
 
-Plusieurs mesures de sécurité sont mises en place :
-
-hachage des mots de passe avec bcrypt ;
-
-authentification par JWT ;
-
-routes protégées par dépendances FastAPI ;
-
-contrôle d’accès par rôle ;
-
-séparation des droits client / administrateur ;
-
-contrôle d’accès aux dossiers et documents ;
-
-configuration CORS limitée aux origines autorisées.
-
-En production, seules les URLs nécessaires sont autorisées dans la configuration CORS.
+- bcrypt (hash mots de passe)  
+- JWT  
+- routes protégées  
+- gestion des rôles  
+- CORS sécurisé  
 
 ---
 
 ## 14. Gestion des fichiers
 
-Les images des véhicules et les documents des dossiers sont stockés dans le dossier :
+Dossier utilisé :
 
-uploads/
+uploads/  
 
-En environnement local, ce stockage permet de tester simplement la fonctionnalité de dépôt de fichiers.
+Sur Heroku :
 
-Limite connue :
+filesystem éphémère (les fichiers peuvent disparaître)
 
-Sur Heroku, le système de fichiers est éphémère (donc les images et/ou dossiers peuvent ne plus exister apres 24h
-il faut alors reuploader les images ou documents en editant la donnée ou en creant une nouvelle).
+Solutions recommandées :
 
-Pour une version de production complète, un stockage externe serait recommandé :
-
-Amazon S3 ;
-
-Cloudinary ;
-
-Supabase Storage ;
-
-autre service équivalent.
+- AWS S3  
+- Cloudinary  
+- Supabase Storage  
 
 ---
 
 ## 15. Déploiement
 
-Le backend est prévu pour être déployé sur Heroku.
+Fichier requis :
 
-Fichiers nécessaires :
+Procfile  
 
-Procfile
+Contenu :
 
-requirements.txt
-
-Contenu du Procfile :
-
-web: gunicorn main:app -k uvicorn.workers.UvicornWorker
-
-Heroku utilise la variable d’environnement DATABASE_URL pour se connecter à PostgreSQL.
+```bash
+web: gunicorn main:app -k uvicorn.workers.UvicornWorker  
+```
 
 ---
 
 ## 16. Commandes utiles Heroku
 
-Afficher les logs entrez ces differentes commandes dans votre terminal :
+Logs :
 
-heroku logs --tail -a nom-application-heroku
+```bash
+heroku logs --tail -a nom-application-heroku  
+```
 
-Ouvrir un shell distant :
+Shell :
 
-heroku run bash -a nom-application-heroku
+```bash
+heroku run bash -a nom-application-heroku  
+```
 
-Créer les tables sur Heroku :
+Créer les tables :
 
-heroku run python -a nom-application-heroku
+```bash
+heroku run python -a nom-application-heroku  
+```
 
-Puis une fois dans l'interface python :
+Puis :
 
-from app.database import Base, engine
-
-Base.metadata.create_all(bind=engine)
-
-exit()
+```bash
+from app.database import Base, engine  
+Base.metadata.create_all(bind=engine)  
+exit()  
+```
 
 ---
 
 ## 17. Structure du projet
 
-mmotors-backend/
-
-│
-
-├── app/
-
-│   ├── core/
-
-│   │   └── security.py
-
-│   │
-
-│   ├── models/
-
-│   │   ├── user.py
-
-│   │   ├── vehicle.py
-
-│   │   ├── vehicle_image.py
-
-│   │   ├── dossier.py
-
-│   │   └── document.py
-
-│   │
-
-│   ├── routes/
-
-│   │   ├── auth.py
-
-│   │   ├── vehicle.py
-
-│   │   ├── dossier.py
-
-│   │   └── document.py
-
-│   │
-
-│   ├── schemas/
-
-│   │   ├── user.py
-
-│   │   ├── vehicle.py
-
-│   │   └── dossier.py
-
-│   │
-
-│   ├── database.py
-
-│   └── dependencies.py
-
-│
-
-├── tests/
-
-│   ├── test_auth.py
-
-│   ├── test_vehicles.py
-
-│   ├── test_dossiers.py
-
-│   ├── test_documents.py
-
-│   ├── test_security.py
-
-│   └── test_full_flow.py
-
-│
-
-├── uploads/
-
-├── main.py
-
-├── requirements.txt
-
-├── Procfile
-
-├── .env
-
-└── README.md
+```text
+mmotors-backend/  
+│  
+├── app/  
+│   ├── core/  
+│   ├── models/  
+│   ├── routes/  
+│   ├── schemas/  
+│   ├── database.py  
+│   └── dependencies.py  
+│  
+├── tests/  
+├── uploads/  
+├── main.py  
+├── requirements.txt  
+├── Procfile  
+└── README.md  
+```
 
 ---
 
 ## 18. Fonctionnalités principales
 
-Le backend permet :
-
-l’inscription et la connexion des utilisateurs ;
-
-la sécurisation des routes par JWT ;
-
-la gestion des rôles client et administrateur ;
-
-la création, modification et suppression des véhicules ;
-
-l’ajout et la suppression d’images de véhicules ;
-
-le dépôt de dossiers client ;
-
-le suivi du statut des dossiers ;
-
-la validation ou le refus des dossiers par l’administrateur ;
-
-l’upload et la consultation de documents liés aux dossiers.
+- authentification  
+- JWT  
+- gestion des rôles  
+- CRUD véhicules  
+- gestion images  
+- dossiers clients  
+- documents  
 
 ---
 
 ## 19. Auteur
 
-Projet réalisé dans le cadre de la formation CDA / Bachelor Développeur d’Application.
-
-Auteur : Bruno
+Bruno
