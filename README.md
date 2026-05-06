@@ -21,7 +21,7 @@ Backend de l’application **M-Motors**, développé avec **Python FastAPI**.
 
 ## Couverture de tests
 
-![Pytest](screenshots/test_cov.png)
+![Pytest](screenshots/tests_cov.png)
 
 ---
 
