@@ -2,6 +2,29 @@
 
 Backend de l’application **M-Motors**, développé avec **Python FastAPI**.
 
+## Stack technique
+
+- Python
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- JWT
+- Pytest
+
+---
+
+## Documentation API
+
+![Swagger](screenshots/swagger_docs.png)
+
+---
+
+## Couverture de tests
+
+![Pytest](screenshots/test_cov.png)
+
+---
+
 L’API permet de gérer :
 
 - l’authentification des utilisateurs ;
